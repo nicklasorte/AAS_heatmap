@@ -34,7 +34,7 @@ array_data=cell2mat(cell_data(:,[1,3]))
 % % full_azi=-90:1:90;
 % % ful_ele=90:-1:-90;
 full_azi=-62:1:62;
-ful_ele=38:-1:-26;
+ful_ele=-26:1:38;
 
 [full_meshX,full_meshY]=meshgrid(full_azi,ful_ele);
 full_array_azi=reshape(full_meshX',[],1);
@@ -95,7 +95,13 @@ toc;  %%%%%%%%%%%9 seconds --> 1.8 seconds
 
 
 
-
+% % %%%%%%%%%Spot Check
+% % azi_spot=-6
+% % ele_spot=-7
+% %   row1_idx=find(azi_spot==full_azi_ele(:,1));
+% %     rows2_idx=find(ele_spot==full_azi_ele(:,2));
+% %       int_idx=intersect(row1_idx,rows2_idx);
+% %       full_azi_ele(int_idx,:)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Plot the new heatmaps
@@ -103,7 +109,41 @@ array_azi=full_azi_ele(:,1);
 array_ele=full_azi_ele(:,2);
 array_eirp=full_azi_ele(:,3);
 fig_label='Nokia1'
-aas_heatmap_plot_rev2(app,fig_label,array_azi,array_ele,array_eirp)
+%aas_heatmap_plot_rev2(app,fig_label,array_azi,array_ele,array_eirp)
+
+
+uni_azi=unique(array_azi);
+uni_el=unique(array_ele);
+mat_size=[numel(uni_azi),numel(uni_el)]; % or swap, depending on what order you want.
+z_eirp=reshape(array_eirp,mat_size);
+ max(max(array_eirp))
+ min(min(array_eirp))
+dbm2_range=max(max(array_eirp))-min(min(array_eirp));
+color_set=plasma(dbm2_range); %%%%%%%%%%%%Colormap
+tic;
+f1=figure;
+AxesH = axes;
+hold on;
+[X,Y] = meshgrid(uni_azi,uni_el);
+Z=z_eirp;
+size(X)
+size(Y)
+size(Z)
+surf(X,Y,Z','EdgeColor','none')
+xticks(min(uni_azi):8:max(uni_azi))
+yticks(min(uni_el):3:max(uni_el))
+xlabel('Azimuth [Degrees]')
+ylabel('Elevation [Degrees]')
+h = colorbar;
+ylabel(h, 'EIRP [dBm]')
+grid on;
+colormap(f1,color_set)
+toc;
+filename1=strcat(fig_label,'.png');
+saveas(gcf,char(filename1))
+toc;
+pause(0.1)
+%close(f1)
 
 
 
